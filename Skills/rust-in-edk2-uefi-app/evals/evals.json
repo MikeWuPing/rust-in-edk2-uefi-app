@@ -1,0 +1,65 @@
+{
+  "skill_name": "rust-in-edk2-uefi-app",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "我把 Rust 编成 staticlib 链进 EDK2 模块，链接时一堆 LNK2001 未解析符号，库明明存在，为什么？",
+      "expected_output": "应该指出 EDK2 链接以 /NODEFAULTLIB 开头，/DEFAULTLIB: 会被忽略，静态库必须作为输入文件列进 INF；并说明顺序无关",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Rust 的 crate 名和 EDK2 模块的 BASE_NAME 一样，构建时报找不到库文件，怎么办？",
+      "expected_output": "应该指出输出的 .lib 名不能等于 BASE_NAME，否则与本模块的归档文件撞名；改 crate 名或在复制时改名（如 rp_core.lib）",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "EDK2 构建时所有 C 文件都死在 #include <stddef.h> 找不到，vcvars 也跑了，怎么回事？",
+      "expected_output": "应该指出 vcvarsall.bat 靠查注册表定位 SDK，受限环境下 reg.exe 被拦导致 INCLUDE 缺 UCRT；对策是脚本自行枚举目录并用 Test-Path 校验 ucrt\\stddef.h，且在 edksetup.bat 之后覆盖 INCLUDE",
+      "files": []
+    },
+    {
+      "id": 4,
+      "prompt": "从 PowerShell 启动 QEMU，窗口不出现或输出被吞，Start-Process 还报 PATH 已存在，正确写法是什么？",
+      "expected_output": "应该给出 cmd /c start /b 加子进程重定向到文件的写法，说明 Start-Process 会因环境块中 Path 与 PATH 重复而崩，WMI 方式会让窗口落在 session 0 而不可见",
+      "files": []
+    },
+    {
+      "id": 5,
+      "prompt": "QEMU monitor 的 screendump 存成 .png，但打开发现其实是 PPM，怎么得到真 PNG？",
+      "expected_output": "应该指出 QEMU 忽略扩展名、始终写 PPM，需要嗅探文件魔数（P6）并用 PIL 转换",
+      "files": []
+    },
+    {
+      "id": 6,
+      "prompt": "LVGL 里我按 RGB 顺序写 888 像素，颜色不对（红色变蓝），是我写错了吗？",
+      "expected_output": "应该指出 lv_color32_t 是 {blue, green, red, alpha}，RGB888 缓冲同样是 B,G,R；并提醒灰度测试会漏检这个错误",
+      "files": []
+    },
+    {
+      "id": 7,
+      "prompt": "界面中文显示成方框，怎么确认字库到底覆盖了哪些字？",
+      "expected_output": "应该要求解析字体 cmap 而不是读注释或 grep 码位，并指出 SPARSE 表的 unicode_list 存的是相对 range_start 的偏移而非绝对码位",
+      "files": []
+    },
+    {
+      "id": 8,
+      "prompt": "C 头文件和 Rust 的 extern 声明怎么保证不写歪？常量写错了编译也不报错。",
+      "expected_output": "应该建议用 check_abi.py 之类的脚本比对两侧函数名与常量数值，并挂在构建流程最前面；指出常量漏改不会有任何编译或链接错误，只会运行期静默取错值",
+      "files": ["templates/check_abi.py"]
+    },
+    {
+      "id": 9,
+      "prompt": "我想让 Rust 写的 UEFI 应用跑在经典 UEFI Shell 下，需要特殊的 Rust Shell 吗？",
+      "expected_output": "应该说明 Shell 只认 PE/COFF 与 EFI_APPLICATION，与语言无关；x86_64-unknown-uefi 产物直接可跑，不需要 Rust 版 Shell",
+      "files": []
+    },
+    {
+      "id": 10,
+      "prompt": "LVGL 容器高度算小了，子对象溢出了却没有任何报错，为什么？",
+      "expected_output": "应该指出 LVGL 默认不裁剪子对象，容器尺寸不足不会报错也不会截断，子对象直接画到边界外；需要显式设置 overflow 或修正布局高度",
+      "files": []
+    }
+  ]
+}
